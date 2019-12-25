@@ -8,7 +8,7 @@ public class Chicken : MonoBehaviour
     // 修飾詞 欄位類型 欄位名稱 (指定 值) 結束
     // 私人 - 隱藏 private (預設)
     // 公開 - 顯示 public 
-    [Header("移動速度")][Range(1, 2000)]
+    [Header("移動速度")] [Range(1, 2000)]
     public int speed = 10;             // 整數 1, 9999, -100
     [Header("旋轉速度"), Tooltip("G8雞的旋轉速度"), Range(1.5f, 200f)]
     public float turn = 20.5f;         // 浮點數
@@ -18,11 +18,15 @@ public class Chicken : MonoBehaviour
     public string _name = "G8雞";      // 字串 ""
     #endregion
 
+    [Header("撿東西位置")]
+    public Rigidbody rigCatch;
+
+
+
     public Transform tran;
     public Rigidbody rig;
     public Animator ani;
     public AudioSource aud;
-
     public AudioClip soundBark;
 
     private void Update()
@@ -33,6 +37,25 @@ public class Chicken : MonoBehaviour
         Catch();
     }
 
+    //觸發碰撞持續執行 (一秒執行約60次) 碰撞物件資訊
+    //黏撿物件起來
+
+    private void OnTriggerStay(Collider other)
+    {
+        
+     print(other.name);
+
+        //如果 碰撞物件的名稱 為 雞腿 並且 動畫為撿東西
+        if (other.name == "雞腿" && ani.GetAnimatorTransitionInfo(0).IsName("撿東西"))
+        { 
+        //物理.忽略碰撞(A碰撞，B碰撞)
+            Physics.IgnoreCollision(other, GetComponent<Collider>());
+        
+            //碰撞物件 取得元件<泛型>().連接身體 = 撿東西位置
+            other.GetComponent<HingeJoint>().connectedBody = rigCatch;
+        
+        }
+    }
     #region 方法區域
     /// <summary>
     /// 跑步
